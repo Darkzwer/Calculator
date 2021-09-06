@@ -9,12 +9,42 @@
 import UIKit
 
 class ViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
+    
+    @IBOutlet private weak var display: UILabel!
+    
+    private var userIsInMiddleOfTyping = false
+    
+    @IBAction private func touchDigit(_ sender: UIButton) {
+        let digit = sender.currentTitle!
+        if userIsInMiddleOfTyping {
+            let textCurrentlyInDisplay = display.text!
+            display.text = textCurrentlyInDisplay + digit
+        } else {
+            display.text = digit
+        }
+        userIsInMiddleOfTyping = true
     }
-
-
+    
+    private var displayValue: Double {
+        get {
+            return Double(display.text!)!
+        }
+        set {
+            display.text = String(newValue)
+        }
+    }
+    
+    private var brain = CalculatorBrain()
+    
+    @IBAction private func performOperation(_ sender: UIButton) {
+        if userIsInMiddleOfTyping {
+            brain.setOperand(operand: displayValue)
+            userIsInMiddleOfTyping = false
+        }
+        userIsInMiddleOfTyping = false
+        if let mathematicSymbol = sender.currentTitle {
+            brain.performOperation(symbol: mathematicSymbol)
+        }
+        displayValue = brain.result
+    }
 }
-
